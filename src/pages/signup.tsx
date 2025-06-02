@@ -16,7 +16,6 @@ import { useSignupMutation } from "@/store/authApi";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [shops, setShops] = useState<string[]>(["", "", ""]);
@@ -77,10 +76,12 @@ const SignupPage = () => {
     }
 
     try {
-      await signup({ username, email, password, shops: validShops }).unwrap();
+      const res = await signup({ username, password, shopNames: validShops }).unwrap();
+      console.log("res", res);
       toast("Account created successfully!");
       navigate("/signin");
     } catch (error: any) {
+        console.log("error", error);
       toast(error.data?.message || "Signup failed");
     }
   };
@@ -105,18 +106,6 @@ const SignupPage = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                required
-                className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="transition-all duration-200 focus:ring-2 focus:ring-blue-500"
               />

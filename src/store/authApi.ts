@@ -9,9 +9,8 @@ interface User {
 
 interface SignupRequest {
   username: string;
-  email: string;
   password: string;
-  shops: string[];
+  shopNames: string[];
 }
 
 interface LoginRequest {
@@ -29,22 +28,17 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
     credentials: "include",
   }),
+
   tagTypes: ["User"],
+
   endpoints: (builder) => ({
     signup: builder.mutation<AuthResponse, SignupRequest>({
-      query: (credentials) => ({
+      query: (data) => ({
         url: "/signup",
         method: "POST",
-        body: credentials,
+        body: data,
       }),
     }),
     login: builder.mutation<AuthResponse, LoginRequest>({
