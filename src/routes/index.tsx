@@ -1,8 +1,11 @@
 import Dashboard from "@/pages/dashboard";
 import Index from "@/pages/Index";
+import ShopPage from "@/pages/shop";
 import SigninPage from "@/pages/signin";
 import SignupPage from "@/pages/signup";
 import { createBrowserRouter } from "react-router-dom";
+import PrivateRoute from "./privateRoute";
+import PublicRoute from "./publicRoute";
 
 export const router = createBrowserRouter([
   {
@@ -10,15 +13,29 @@ export const router = createBrowserRouter([
     element: <Index />,
   },
   {
-    path: "/signin",
-    element: <SigninPage />,
+    element: <PublicRoute />,
+    children: [
+      {
+        path: "/signin",
+        element: <SigninPage />,
+      },
+      {
+        path: "/signup",
+        element: <SignupPage />,
+      },
+    ],
   },
   {
-    path: "/signup",
-    element: <SignupPage />,
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
+    element: <PrivateRoute />,
+    children: [
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/shop",
+        element: <ShopPage />,
+      },
+    ],
   },
 ]);

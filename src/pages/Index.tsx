@@ -11,6 +11,7 @@ import { Store, Users, Shield, Zap } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,7 +9,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,31 +19,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Store, User, LogOut } from "lucide-react";
+import { Store, LogOut, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useGetProfileQuery, useLogoutMutation } from "@/store/authApi";
-import { getCookie } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { resetUser } from "@/store/authSlice";
 
 const Dashboard = () => {
-  const { data: profile, isLoading } = useGetProfileQuery();
+  const { data, isLoading } = useGetProfileQuery();
   const [logoutMutation] = useLogoutMutation();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!getCookie()) {
-      navigate("/signin");
-    }
-  }, [getCookie, navigate]);
+  const currentUser = data?.data ?? user;
 
   const handleLogout = async () => {
     try {
       await logoutMutation().unwrap();
       toast("Logged out successfully");
+      dispatch(resetUser());
       navigate("/signin");
     } catch (error) {
-      // Even if logout API fails, clear local state
       navigate("/signin");
     }
   };
@@ -58,10 +55,13 @@ const Dashboard = () => {
     );
   }
 
+  const handleShopClick = (shop: string) => {
+    const shopUrl = `http://${shop.split(" ").join("-")}.localhost:5173/shop`;
+    window.open(shopUrl, "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
-      {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -77,21 +77,26 @@ const Dashboard = () => {
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                      {profile?.email?.charAt(0).toUpperCase() || "U"}
+                      {currentUser?.username?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem className="flex items-center">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>{profile?.email}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem disabled className="opacity-70">
                   <Store className="mr-2 h-4 w-4" />
                   <span>My Shops</span>
                 </DropdownMenuItem>
+                {currentUser?.shopNames?.map((shop: string) => (
+                  <DropdownMenuItem
+                    key={shop}
+                    onClick={() => handleShopClick(shop)}
+                    className="flex items-center justify-between"
+                  >
+                    <span>{shop}</span>
+                    <ExternalLink className="h-4 w-4 ml-2" />
+                  </DropdownMenuItem>
+                ))}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => setShowLogoutDialog(true)}
@@ -106,7 +111,6 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -124,14 +128,13 @@ const Dashboard = () => {
               Dashboard Ready
             </h3>
             <p className="text-gray-600">
-              Your Redux + RTK Query integration is complete. Add shop
-              management features as needed.
+              Your Shop is ready to business. Add shop management features as
+              needed.
             </p>
           </CardContent>
         </Card>
       </main>
 
-      {/* Logout Confirmation Dialog */}
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

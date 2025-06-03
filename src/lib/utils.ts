@@ -5,6 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const getCookie = () => {
-  return document.cookie.split("=")[1]
-}
+
+
+export const isEmpty = (obj:Record<string, any>)=>{
+  return Object.keys(obj).length;
+} 

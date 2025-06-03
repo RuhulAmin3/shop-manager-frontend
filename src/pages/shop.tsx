@@ -1,40 +1,35 @@
-
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Store, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Store, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 const ShopPage = () => {
-  const { user, loading } = useAuth();
-  const [shopName, setShopName] = useState('');
-  const [isValidating, setIsValidating] = useState(true);
+  const { checking, authorized } = useAuthCheck();
+  const [shopName, setShopName] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Extract shop name from subdomain simulation
     const hostname = window.location.hostname;
-    const subdomain = hostname.split('.')[0];
-    
-    // For localhost development, check if it's a subdomain pattern
-    if (hostname.includes('localhost') && subdomain !== 'localhost') {
+    const subdomain = hostname.split(".")[0];
+
+    if (hostname.includes("localhost") && subdomain !== "localhost") {
       setShopName(subdomain);
     } else {
-      // Fallback for non-subdomain URLs, extract from pathname or search params
       const urlParams = new URLSearchParams(window.location.search);
-      const shopParam = urlParams.get('shop');
+      const shopParam = urlParams.get("shop");
       if (shopParam) {
         setShopName(shopParam);
       }
     }
-    
-    // Simulate token validation delay
-    setTimeout(() => {
-      setIsValidating(false);
-    }, 1500);
   }, []);
 
-  if (loading || isValidating) {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  if (checking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm shadow-xl">
@@ -47,7 +42,7 @@ const ShopPage = () => {
     );
   }
 
-  if (!user) {
+  if (!authorized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <Card className="w-full max-w-md bg-white/80 backdrop-blur-sm shadow-xl">
@@ -60,8 +55,8 @@ const ShopPage = () => {
             <p className="text-gray-600 mb-4">
               You need to be logged in to access this shop.
             </p>
-            <Button 
-              onClick={() => navigate('/signin')}
+            <Button
+              onClick={() => navigate("/signin")}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
             >
               Sign In
@@ -79,21 +74,19 @@ const ShopPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate("/dashboard")}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Dashboard
               </Button>
             </div>
-            
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              {shopName || 'Shop'} Store
+              {shopName || "Shop"} Store
             </h1>
-            
             <div className="w-24"></div> {/* Spacer for center alignment */}
           </div>
         </div>
@@ -109,14 +102,15 @@ const ShopPage = () => {
               </div>
             </div>
             <CardTitle className="text-4xl font-bold text-gray-900 mb-2">
-              This is {shopName || 'the'} shop
+              This is {shopName || "the"} shop
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center py-12">
             <p className="text-xl text-gray-600 mb-8">
-              Welcome to the {shopName || 'shop'} dashboard! This is where you can manage your store.
+              Welcome to the {shopName || "shop"} dashboard! This is where you
+              can manage your store.
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardContent className="p-6 text-center">
@@ -124,17 +118,19 @@ const ShopPage = () => {
                   <p className="text-blue-600 text-sm">Manage your inventory</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                 <CardContent className="p-6 text-center">
                   <h3 className="font-semibold text-purple-800 mb-2">Orders</h3>
                   <p className="text-purple-600 text-sm">Track your sales</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold text-green-800 mb-2">Analytics</h3>
+                  <h3 className="font-semibold text-green-800 mb-2">
+                    Analytics
+                  </h3>
                   <p className="text-green-600 text-sm">View performance</p>
                 </CardContent>
               </Card>

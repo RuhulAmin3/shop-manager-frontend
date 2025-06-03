@@ -13,9 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useLoginMutation } from "@/store/authApi";
-import { useAppDispatch } from "@/store/hook";
 import { toast } from "sonner";
-import { setCredentials } from "@/store/authSlice";
 
 const SigninPage = () => {
   const [username, setUsername] = useState("");
@@ -23,16 +21,13 @@ const SigninPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [login, { isLoading }] = useLoginMutation();
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const result = await login({ username, password }).unwrap();
-      dispatch(setCredentials({ user: result.user, token: result.token }));
-
+      await login({ username, password, remember: rememberMe }).unwrap();
       toast("Welcome back!");
       navigate("/dashboard");
     } catch (error: any) {

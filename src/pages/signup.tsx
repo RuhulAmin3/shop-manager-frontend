@@ -76,12 +76,15 @@ const SignupPage = () => {
     }
 
     try {
-      const res = await signup({ username, password, shopNames: validShops }).unwrap();
-      console.log("res", res);
+      await signup({
+        username,
+        password,
+        shopNames: validShops,
+      }).unwrap();
       toast("Account created successfully!");
       navigate("/signin");
     } catch (error: any) {
-        console.log("error", error);
+      console.log("error", error);
       toast(error.data?.message || "Signup failed");
     }
   };
